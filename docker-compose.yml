@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  mqtt-broker:
+    image: eclipse-mosquitto:2.0
+    container_name: mqtt-broker
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_log:/mosquitto/log
+
+  device_01:
+    build:
+      context: ./devices
+    environment:
+      - DEVICE_ID=device_01
+      - MQTT_TOPIC=iot/broiler
+      - BROKER_HOST=mqtt-broker
+      - INTERVAL=5
+    depends_on:
+      - mqtt-broker
+
+  device_02:
+    build:
+      context: ./devices
+    environment:
+      - DEVICE_ID=device_02
+      - MQTT_TOPIC=iot/broiler
+      - BROKER_HOST=mqtt-broker
+      - INTERVAL=5
+    depends_on:
+      - mqtt-broker
+
+volumes:
+  mosquitto_data:
+  mosquitto_log:

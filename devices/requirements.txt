@@ -1,0 +1,7 @@
+paho-mqtt==1.6.1
+
+# docker-compose build
+# docker-compose up -d mqtt-broker
+# docker-compose up -d device_01 device_02
+
+
