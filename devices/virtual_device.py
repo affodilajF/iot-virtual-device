@@ -4,6 +4,8 @@ import json
 import os
 import logging
 import paho.mqtt.client as mqtt
+import signal
+import sys
 
 # --- Setup logging ---
 logging.basicConfig(
@@ -20,9 +22,14 @@ TOPIC = os.getenv("MQTT_TOPIC", "iot/broiler")
 DEVICE_ID = os.getenv("DEVICE_ID", "device_01")
 INTERVAL = int(os.getenv("INTERVAL", 5))
 
+status_topic = f"{TOPIC}/status/{DEVICE_ID}"
+
 client = mqtt.Client(DEVICE_ID)
 
-# --- Retry loop to connect broker ---
+# Setup Last Will and Testament (LWT)
+client.will_set(status_topic, payload="offline", qos=1, retain=True)
+
+# Connect to broker
 while True:
     try:
         client.connect(BROKER, PORT, 60)
@@ -32,7 +39,12 @@ while True:
         logger.warning(f"{DEVICE_ID} broker not ready, retry in 2s... ({e})")
         time.sleep(2)
 
-# --- Generate random IoT data ---
+client.loop_start()
+
+# Publish online status with retain so subscriber knows device is online
+client.publish(status_topic, "online", qos=1, retain=True)
+logger.info(f"{DEVICE_ID} status published to {status_topic}: online")
+
 def generate_data():
     return {
         "device_id": DEVICE_ID,
@@ -42,9 +54,23 @@ def generate_data():
         "timestamp": int(time.time())
     }
 
-# --- Main loop ---
+def graceful_exit(signum, frame):
+    logger.info("Signal received, publishing offline status and exiting...")
+    client.publish(status_topic, "offline", qos=1, retain=True)
+    logger.info(f"{DEVICE_ID} status published to {status_topic}: offline")
+    time.sleep(1)  # wait to ensure message is sent
+    client.loop_stop()
+    client.disconnect()
+    sys.exit(0)
+
+# Register signal handlers for graceful exit
+signal.signal(signal.SIGINT, graceful_exit)   # Ctrl+C
+signal.signal(signal.SIGTERM, graceful_exit)  # kill command
+
+# Main loop: publish sensor data
 while True:
     data = generate_data()
-    client.publish(TOPIC, json.dumps(data))
-    logger.info(f"{DEVICE_ID} sent: {data}")
+    topic = f"{TOPIC}/{DEVICE_ID}"
+    client.publish(topic, json.dumps(data))
+    logger.info(f"{DEVICE_ID} sent to {topic}: {data}")
     time.sleep(INTERVAL)

@@ -1,5 +1,4 @@
 version: "3.8"
-
 services:
   mqtt-broker:
     image: eclipse-mosquitto:2.0
@@ -11,26 +10,25 @@ services:
       - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
       - mosquitto_data:/mosquitto/data
       - mosquitto_log:/mosquitto/log
-
   device_01:
-    build:
-      context: ./devices
+    build: ./devices
     environment:
       - DEVICE_ID=device_01
-      - MQTT_TOPIC=iot/broiler
       - BROKER_HOST=mqtt-broker
-      - INTERVAL=5
+      - MQTT_TOPIC=iot/broiler
+    stop_grace_period: 10s
+    stop_signal: SIGTERM
     depends_on:
       - mqtt-broker
 
   device_02:
-    build:
-      context: ./devices
+    build: ./devices
     environment:
       - DEVICE_ID=device_02
-      - MQTT_TOPIC=iot/broiler
       - BROKER_HOST=mqtt-broker
-      - INTERVAL=5
+      - MQTT_TOPIC=iot/broiler
+    stop_grace_period: 10s
+    stop_signal: SIGTERM
     depends_on:
       - mqtt-broker
 
