@@ -42,7 +42,11 @@ while True:
 client.loop_start()
 
 # Publish online status with retain so subscriber knows device is online
-client.publish(status_topic, "online", qos=1, retain=True)
+payload = {
+    "device_id": DEVICE_ID,
+    "status": "online"
+}
+client.publish(status_topic, json.dumps(payload), qos=1, retain=True)
 logger.info(f"{DEVICE_ID} status published to {status_topic}: online")
 
 def generate_data():
@@ -56,7 +60,11 @@ def generate_data():
 
 def graceful_exit(signum, frame):
     logger.info("Signal received, publishing offline status and exiting...")
-    client.publish(status_topic, "offline", qos=1, retain=True)
+    payload = {
+    "device_id": DEVICE_ID,
+    "status": "offline"
+    }
+    client.publish(status_topic, json.dumps(payload), qos=1, retain=True)
     logger.info(f"{DEVICE_ID} status published to {status_topic}: offline")
     time.sleep(1)  # wait to ensure message is sent
     client.loop_stop()
