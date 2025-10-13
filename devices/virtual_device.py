@@ -55,7 +55,8 @@ def generate_data():
         "temperature": round(random.uniform(20, 35), 2),
         "humidity": round(random.uniform(50, 90), 2),
         "ammonia": round(random.uniform(0, 50), 2),
-        "timestamp": int(time.time())
+        "timestamp": int(time.time()), 
+        "offset": 7
     }
 
 def graceful_exit(signum, frame):
