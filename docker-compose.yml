@@ -15,7 +15,7 @@ services:
     environment:
       - DEVICE_ID=device_01
       - BROKER_HOST=mqtt-broker
-      - MQTT_TOPIC=iot/broiler
+      - MQTT_TOPIC=iot
     stop_grace_period: 10s
     stop_signal: SIGTERM
     depends_on:
@@ -26,7 +26,7 @@ services:
     environment:
       - DEVICE_ID=device_02
       - BROKER_HOST=mqtt-broker
-      - MQTT_TOPIC=iot/broiler
+      - MQTT_TOPIC=iot
     stop_grace_period: 10s
     stop_signal: SIGTERM
     depends_on:

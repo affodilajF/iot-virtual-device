@@ -79,7 +79,7 @@ signal.signal(signal.SIGTERM, graceful_exit)  # kill command
 # Main loop: publish sensor data
 while True:
     data = generate_data()
-    topic = f"{TOPIC}/{DEVICE_ID}"
+    topic = f"{TOPIC}/data/{DEVICE_ID}"
     client.publish(topic, json.dumps(data))
     logger.info(f"{DEVICE_ID} sent to {topic}: {data}")
     time.sleep(INTERVAL)
