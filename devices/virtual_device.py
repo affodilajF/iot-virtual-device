@@ -18,7 +18,8 @@ logger = logging.getLogger(__name__)
 # --- MQTT Config ---
 BROKER = os.getenv("BROKER_HOST", "mqtt-broker")
 PORT = int(os.getenv("BROKER_PORT", 1883))
-TOPIC = os.getenv("MQTT_TOPIC", "iot/broiler")
+# TOPIC = os.getenv("MQTT_TOPIC", "iot")
+TOPIC = "iot/broiler"
 DEVICE_ID = os.getenv("DEVICE_ID", "device_01")
 INTERVAL = int(os.getenv("INTERVAL", 5))
 
@@ -46,7 +47,7 @@ payload = {
     "device_id": DEVICE_ID,
     "status": "online"
 }
-client.publish(status_topic, json.dumps(payload), qos=1, retain=True)
+client.publish(status_topic, json.dumps(payload), qos=0, retain=True)
 logger.info(f"{DEVICE_ID} status published to {status_topic}: online")
 
 def generate_data():
