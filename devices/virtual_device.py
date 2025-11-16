@@ -28,7 +28,13 @@ status_topic = f"{TOPIC}/status/{DEVICE_ID}"
 client = mqtt.Client(DEVICE_ID)
 
 # Setup Last Will and Testament (LWT)
-client.will_set(status_topic, payload="offline", qos=1, retain=True)
+payload = {
+    "device_id": DEVICE_ID,
+    "status": "online",
+    "timestamp": int(time.time()), 
+    "offset": 7
+}
+client.will_set(status_topic, payload=json.dumps(payload), qos=1, retain=True)
 
 # Connect to broker
 while True:
@@ -45,10 +51,12 @@ client.loop_start()
 # Publish online status with retain so subscriber knows device is online
 payload = {
     "device_id": DEVICE_ID,
-    "status": "online"
+    "status": "online",
+    "timestamp": int(time.time()), 
+    "offset": 7
 }
 client.publish(status_topic, json.dumps(payload), qos=0, retain=True)
-logger.info(f"{DEVICE_ID} status published to {status_topic}: online")
+logger.info(f"{DEVICE_ID} status published to {status_topic}: {payload}")
 
 def generate_data():
     return {
@@ -64,10 +72,12 @@ def graceful_exit(signum, frame):
     logger.info("Signal received, publishing offline status and exiting...")
     payload = {
     "device_id": DEVICE_ID,
-    "status": "offline"
+    "status": "offline",
+    "timestamp": int(time.time()), 
+    "offset": 7
     }
     client.publish(status_topic, json.dumps(payload), qos=1, retain=True)
-    logger.info(f"{DEVICE_ID} status published to {status_topic}: offline")
+    logger.info(f"{DEVICE_ID} status published to {status_topic}: {payload}")
     time.sleep(1)  # wait to ensure message is sent
     client.loop_stop()
     client.disconnect()
