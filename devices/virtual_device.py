@@ -28,13 +28,13 @@ status_topic = f"{TOPIC}/status/{DEVICE_ID}"
 client = mqtt.Client(DEVICE_ID)
 
 # Setup Last Will and Testament (LWT)
-payload = {
-    "device_id": DEVICE_ID,
-    "status": "online",
-    "timestamp": int(time.time()), 
-    "offset": 7
-}
-client.will_set(status_topic, payload=json.dumps(payload), qos=1, retain=True)
+# payload = {
+#     "device_id": DEVICE_ID,
+#     "status": "offline",
+#     "timestamp": int(time.time()), 
+#     "offset": 7
+# }
+# client.will_set(status_topic, payload=json.dumps(payload), qos=1, retain=True)
 
 # Connect to broker
 while True:
